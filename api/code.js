@@ -6,10 +6,15 @@ if (!global.currentActiveCode) {
 }
 
 export default function handler(req, res) {
-    // Enable cross-origin requests so your Roblox game can talk to it
+    // Enable cross-origin requests so your Roblox game can talk to it without blocks
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    // Handle preflight OPTIONS requests from browsers/servers safely
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
 
     // Automatically check if 5 minutes (300,000 milliseconds) have passed
     const timePassed = Date.now() - global.lastGeneratedTime;
@@ -25,13 +30,14 @@ export default function handler(req, res) {
         global.lastGeneratedTime = Date.now();
     }
 
-    // ROBLOX REDEEMS CODE (POST Request)
-    if (req.method === 'POST') {
+    // ROBLOX REDEEMS CODE (Triggered when Roblox calls PostAsync)
+    // We check the URL query or the method type to be 100% sure we catch Roblox's request
+    if (req.method === 'POST' || req.query.action === 'redeem') {
         global.codeUsedStatus = true;
-        return res.status(200).json({ success: true });
+        return res.status(200).json({ success: true, message: "Code marked as used!" });
     }
 
-    // PLAYER VISITS WEBSITE (HTML View)
+    // PLAYER VISITS WEBSITE (HTML View in browser)
     if (req.headers.accept && req.headers.accept.includes('text/html')) {
         return res.status(200).send(`
             <html>
@@ -51,7 +57,7 @@ export default function handler(req, res) {
         `);
     }
 
-    // ROBLOX CHECKS CODE STATUS (GET Request returning raw JSON)
+    // ROBLOX CHECKS CODE STATUS (Default response: returns clean JSON)
     return res.status(200).json({ 
         activeCode: global.currentActiveCode, 
         isUsed: global.codeUsedStatus 
