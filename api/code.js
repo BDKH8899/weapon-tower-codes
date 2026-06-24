@@ -13,7 +13,6 @@ export default function handler(req, res) {
         return res.status(200).end();
     }
 
-    // Check if 5 minutes (300,000 ms) have completely passed
     const timePassed = Date.now() - global.lastGeneratedTime;
     if (timePassed >= 300000) {
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -27,7 +26,6 @@ export default function handler(req, res) {
         global.lastGeneratedTime = Date.now();
     }
 
-    // Calculate exact milliseconds remaining until the next scheduled generation
     const msLeft = Math.max(0, 300000 - (Date.now() - global.lastGeneratedTime));
 
     if (req.method === 'POST') {
@@ -35,7 +33,6 @@ export default function handler(req, res) {
         return res.status(200).json({ success: true });
     }
 
-    // FRONTEND WEBPAGE DISPLAY
     if (req.headers.accept && req.headers.accept.includes('text/html')) {
         return res.status(200).send(`
             <!DOCTYPE html>
@@ -64,13 +61,18 @@ export default function handler(req, res) {
                         border-radius: 20px;
                         box-shadow: 0 15px 35px rgba(0,0,0,0.6);
                         border: 3px solid #ff3344;
+                        box-sizing: border-box;
                     }
                     .game-logo {
                         max-width: 100%;
-                        height: auto;
+                        max-height: 220px;
+                        object-fit: contain;
                         border-radius: 12px;
                         margin-bottom: 15px;
                         box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+                        display: block;
+                        margin-left: auto;
+                        margin-right: auto;
                     }
                     .code-box {
                         font-size: 42px;
@@ -84,11 +86,14 @@ export default function handler(req, res) {
                         letter-spacing: 3px;
                         text-shadow: 0 0 10px rgba(85,255,127,0.3);
                     }
+                    .btn-container {
+                        margin: 15px 0;
+                    }
                     .btn {
-                        display: inline-block;
-                        width: 85%;
-                        padding: 14px;
-                        margin: 8px 0;
+                        display: block;
+                        width: 100%;
+                        padding: 14px 0;
+                        margin: 12px 0;
                         font-size: 16px;
                         font-weight: bold;
                         text-transform: uppercase;
@@ -96,41 +101,49 @@ export default function handler(req, res) {
                         border-radius: 8px;
                         cursor: pointer;
                         transition: all 0.2s ease;
-                        text-decoration: none;
+                        text-decoration: none !important;
+                        box-sizing: border-box;
+                        text-align: center;
                     }
                     .btn-copy {
-                        background: #00aaff;
-                        color: white;
+                        background: #00aaff !important;
+                        color: white !important;
                         box-shadow: 0 4px 14px rgba(0,170,255,0.4);
                     }
-                    .btn-copy:hover { background: #0088cc; transform: translateY(-2px); }
+                    .btn-copy:hover { background: #0088cc !important; transform: translateY(-2px); }
+                    
                     .btn-play {
-                        background: #00e676;
-                        color: #000;
+                        background: #00e676 !important;
+                        color: #000000 !important;
                         box-shadow: 0 4px 14px rgba(0,230,118,0.4);
                     }
-                    .btn-play:hover { background: #00c853; transform: translateY(-2px); }
+                    .btn-play:hover { background: #00c853 !important; transform: translateY(-2px); }
+                    
                     .timer-text {
                         font-size: 18px;
                         color: #ffaa00;
                         font-weight: bold;
-                        margin-top: 15px;
+                        margin-top: 20px;
                         letter-spacing: 1px;
                     }
                 </style>
             </head>
             <body>
                 <div class="card">
-                    <img src="https://items.roblox.com/v1/assets/94156689139893/render" alt="Weapon Tower 2 Logo" class="game-logo">
+                    <img src="/logo.png" alt="Weapon Tower 2 Logo" class="game-logo">
                     
-                    <h1 style="margin: 5px 0 0 0; color: #ff3344; letter-spacing: 1px;">WEAPON TOWER 2</h1>
+                    <h1 style="margin: 15px 0 0 0; color: #ff3344; letter-spacing: 1px;">WEAPON TOWER 2</h1>
                     <p style="color: #a0a0b5; margin: 5px 0 25px 0;">Active Limited-Time Reward Code</p>
                     
                     <div class="code-box" id="codeText">${global.currentActiveCode}</div>
                     
-                    <button class="btn btn-copy" onclick="copyCode()">📋 Copy Code</button>
+                    <div class="btn-container">
+                        <button class="btn btn-copy" onclick="copyCode()">📋 Copy Code</button>
+                    </div>
                     
-                    <a href="https://www.roblox.com/games/87583133713556/WEAPON-TOWER-2">🎮 Play Game</a>
+                    <div class="btn-container">
+                        <a href="https://www.roblox.com/games/87583133713556/WEAPON-TOWER-2" class="btn btn-play">🎮 Play Game</a>
+                    </div>
                     
                     <div class="timer-text" id="timer">Loading reset countdown...</div>
                 </div>
@@ -148,8 +161,6 @@ export default function handler(req, res) {
                         let totalSeconds = Math.floor(timeLeft / 1000);
                         let minutes = Math.floor(totalSeconds / 60);
                         let seconds = totalSeconds % 60;
-
-                        // Pad seconds with a zero if below 10
                         seconds = seconds < 10 ? '0' + seconds : seconds;
 
                         document.getElementById("timer").innerHTML = "⏱️ Code Resets In: " + minutes + ":" + seconds;
