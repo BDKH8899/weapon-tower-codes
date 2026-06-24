@@ -1,5 +1,5 @@
 if (!global.currentActiveCode) {
-    global.currentActiveCode = "START-1234";
+    global.currentActiveCode = "D2H4-1S3P";
     global.codeUsedStatus = false;
     global.lastGeneratedTime = Date.now();
 }
