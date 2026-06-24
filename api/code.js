@@ -121,7 +121,7 @@ export default function handler(req, res) {
             </head>
             <body>
                 <div class="card">
-                    <img src="/logo.png" alt="Weapon Tower 2 Logo" class="game-logo" onerror="this.style.display='none'">
+                    <img src="https://items.roblox.com/v1/assets/94156689139893/render" alt="Weapon Tower 2 Logo" class="game-logo">
                     
                     <h1 style="margin: 5px 0 0 0; color: #ff3344; letter-spacing: 1px;">WEAPON TOWER 2</h1>
                     <p style="color: #a0a0b5; margin: 5px 0 25px 0;">Active Limited-Time Reward Code</p>
